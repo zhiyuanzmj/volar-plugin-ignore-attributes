@@ -3,8 +3,8 @@
   "type": "module",
   "version": "0.0.0",
   "packageManager": "pnpm@8.11.0",
-  "description": "_description_",
-  "author": "Anthony Fu <anthonyfu117@hotmail.com>",
+  "description": "A volar plugin to ignore unocss attributes for jsx.",
+  "author": "zhiyuanzmj <zhiyuanzmj@gmail.com>",
   "license": "MIT",
   "funding": "https://github.com/sponsors/zhiyuanzmj",
   "homepage": "https://github.com/zhiyuanzmj/volar-plugin-ignore-attributes#readme",
@@ -46,6 +46,9 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "prepare": "simple-git-hooks"
+  },
+  "dependencies": {
+    "@vue/language-core": "^1.8.25"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.4.0",
