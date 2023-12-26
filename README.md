@@ -28,6 +28,7 @@ pnpm add -D volar-plugin-ignore-attributes
     // "ignoreAttributes": {
     //   "include": ["icon"],
     //   "exclude": ["visible"]
+    //   "prefix": "uno:"
     // }
   }
 }

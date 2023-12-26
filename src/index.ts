@@ -10,6 +10,7 @@ import { getRules } from './rule'
 interface Options {
   include?: string[]
   exclude?: string[]
+  flex?: string
 }
 
 export function isMatched(rule: string | RegExp, name: string) {
@@ -30,7 +31,7 @@ function toRegex(rule: string | RegExp) {
 const plugin: VueLanguagePlugin = ({ modules: { typescript: ts }, vueCompilerOptions }) => {
   const cache = new Map<string, boolean>()
   const options = (vueCompilerOptions as any).ignoreAttributes ?? {} as Options
-  const rules = getRules()
+  const rules = getRules(options.prefix)
   rules.push(...options.include?.map(toRegex) || [])
 
   const exclude = [/^v-.*/, ...options.exclude?.map(toRegex) || []]
