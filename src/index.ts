@@ -13,7 +13,7 @@ interface Options {
   flex?: string
 }
 
-export function isMatched(rule: string | RegExp, name: string) {
+function isMatched(rule: string | RegExp, name: string) {
   return typeof rule === 'string'
     ? rule === name
     : rule.test(name)
