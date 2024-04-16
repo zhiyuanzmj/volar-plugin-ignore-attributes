@@ -1,5 +1,4 @@
 import {
-  FileKind,
   replaceSourceRange,
 } from '@vue/language-core'
 import type {
@@ -38,9 +37,9 @@ const plugin: VueLanguagePlugin = ({ modules: { typescript: ts }, vueCompilerOpt
 
   return {
     name: 'ignore-attributes',
-    version: 1,
-    resolveEmbeddedFile(fileName, sfc, embeddedFile) {
-      if (embeddedFile.kind !== FileKind.TypeScriptHostFile)
+    version: 2,
+    resolveEmbeddedCode(fileName, sfc, embeddedFile) {
+      if (!['jsx', 'tsx'].includes(embeddedFile.lang))
         return
 
       for (const source of ['script', 'scriptSetup'] as const) {
