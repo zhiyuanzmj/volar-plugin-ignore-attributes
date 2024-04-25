@@ -13,7 +13,7 @@ const twoStringsCompositionSuffix = [
 
 const twoStringsComposition = [
   ...twoStringsCompositionPrefix.flatMap(
-    prefix => twoStringsCompositionSuffix.map(suffix => `${prefix}${suffix}`),
+    prefix => twoStringsCompositionSuffix.map(suffix => `${prefix}${suffix}\\d+(px)?`),
   ),
   'ha',
   'wa',
