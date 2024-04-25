@@ -46,7 +46,7 @@ const plugin: VueLanguagePlugin = ({ modules: { typescript: ts }, vueCompilerOpt
         if (!sfc[source]?.ast)
           continue
 
-        function walkJsxShortBind(
+        function walk(
           node: import('typescript/lib/tsserverlibrary').Node,
         ) {
           const properties = ts.isJsxElement(node)
@@ -85,9 +85,9 @@ const plugin: VueLanguagePlugin = ({ modules: { typescript: ts }, vueCompilerOpt
             }
           }
 
-          node.forEachChild(walkJsxShortBind)
+          node.forEachChild(walk)
         }
-        sfc[source]?.ast.forEachChild(walkJsxShortBind)
+        sfc[source]?.ast.forEachChild(walk)
       }
     },
   }
