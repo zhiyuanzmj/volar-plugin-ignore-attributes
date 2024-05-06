@@ -13,7 +13,7 @@ const twoStringsCompositionSuffix = [
 
 const twoStringsComposition = [
   ...twoStringsCompositionPrefix.flatMap(
-    prefix => twoStringsCompositionSuffix.map(suffix => `${prefix}${suffix}\\d+(px)?`),
+    prefix => twoStringsCompositionSuffix.map(suffix => `${prefix}${suffix}\\d*(px)?`),
   ),
   'ha',
   'wa',
@@ -142,7 +142,7 @@ const stringNumberAttributes = `(${[
   'w',
   'h',
   'z',
-].join('|')})\\d+(px)?`
+].join('|')})\\d*(px)?`
 
 const pseudoPrefixAttributes = pseudoPrefix.join('|')
 

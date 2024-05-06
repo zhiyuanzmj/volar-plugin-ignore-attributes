@@ -4,7 +4,7 @@ import { getRules } from '../src/rule'
 describe('should', () => {
   const rules = getRules()
   it('exported', () => {
-    const attrs = ['flex', 'sm:op30', 'm1']
+    const attrs = ['flex', 'sm:op30', 'm1', 'mb']
     for (const attr of attrs) {
       const res = rules.some(rule => typeof rule === 'string'
         ? rule === attr
