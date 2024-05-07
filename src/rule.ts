@@ -139,6 +139,7 @@ const stringNumberAttributes = `(${[
   'fw',
   'p',
   'm',
+  'b',
   'w',
   'h',
   'z',
