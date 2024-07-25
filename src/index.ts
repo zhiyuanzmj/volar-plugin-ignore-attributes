@@ -1,9 +1,7 @@
-import {
-  replaceSourceRange,
-} from '@vue/language-core'
 import type {
   VueLanguagePlugin,
 } from '@vue/language-core'
+import { replaceSourceRange } from 'muggle-string'
 import { getRules } from './rule'
 
 interface Options {
@@ -37,8 +35,8 @@ const plugin: VueLanguagePlugin = ({ modules: { typescript: ts }, vueCompilerOpt
 
   return {
     name: 'ignore-attributes',
-    version: 2,
-    resolveEmbeddedCode(fileName, sfc, embeddedFile) {
+    version: 2.1,
+    resolveEmbeddedCode(_, sfc, embeddedFile) {
       if (!['jsx', 'tsx'].includes(embeddedFile.lang))
         return
 
@@ -60,7 +58,7 @@ const plugin: VueLanguagePlugin = ({ modules: { typescript: ts }, vueCompilerOpt
               && (!attribute.initializer
               || ts.isStringLiteral(attribute.initializer))
             ) {
-              const attributeName = attribute.name.getText(sfc[source]?.ast)
+              const attributeName = getText(attribute.name, sfc[source]!.ast, ts)
               if (exclude.some(rule => isMatched(rule, attributeName)))
                 continue
 
@@ -78,19 +76,35 @@ const plugin: VueLanguagePlugin = ({ modules: { typescript: ts }, vueCompilerOpt
                 replaceSourceRange(
                   embeddedFile.content,
                   source,
-                  attribute.getStart(sfc[source]?.ast, false),
-                  attribute.getEnd(),
+                  getStart(attribute, sfc[source]!.ast, ts),
+                  attribute.end,
                 )
               }
             }
           }
 
-          node.forEachChild(walk)
+          ts.forEachChild(node, walk)
         }
-        sfc[source]?.ast.forEachChild(walk)
+        ts.forEachChild(sfc[source]?.ast, walk)
       }
     },
   }
 }
 
 export default plugin
+
+function getStart(
+  node: import('typescript').Node,
+  ast: import('typescript').SourceFile,
+  ts: typeof import('typescript'),
+): number {
+  return (ts as any).getTokenPosOfNode(node, ast)
+}
+
+function getText(
+  node: import('typescript').Node,
+  ast: import('typescript').SourceFile,
+  ts: typeof import('typescript'),
+): string {
+  return ast.text.slice(getStart(node, ast, ts), node.end)
+}
