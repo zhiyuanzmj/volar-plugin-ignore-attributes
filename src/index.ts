@@ -16,11 +16,11 @@ function isMatched(rule: string | RegExp, name: string) {
     : rule.test(name)
 }
 
-function toRegex(rule: string | RegExp) {
+export function toRegex(rule: string | RegExp) {
   let _rule = rule
   if (typeof _rule === 'string') {
     if (/^\/.*\/$/.test(_rule))
-      _rule = new RegExp(_rule)
+      _rule = new RegExp(_rule.slice(1, -1))
   }
   return _rule
 }
@@ -45,7 +45,7 @@ const plugin: VueLanguagePlugin = ({ modules: { typescript: ts }, vueCompilerOpt
           continue
 
         function walk(
-          node: import('typescript/lib/tsserverlibrary').Node,
+          node: import('typescript').Node,
         ) {
           const properties = ts.isJsxElement(node)
             ? node.openingElement.attributes.properties
