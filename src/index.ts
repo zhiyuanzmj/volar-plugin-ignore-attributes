@@ -16,11 +16,10 @@ function isMatched(rule: string | RegExp, name: string) {
     : rule.test(name)
 }
 
-export function toRegex(rule: string | RegExp) {
+function toRegex(rule: string | RegExp) {
   let _rule = rule
   if (typeof _rule === 'string') {
-    if (/^\/.*\/$/.test(_rule))
-      _rule = new RegExp(_rule.slice(1, -1))
+    _rule = new RegExp(_rule)
   }
   return _rule
 }
