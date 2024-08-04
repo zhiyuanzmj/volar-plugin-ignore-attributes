@@ -9,6 +9,8 @@ const twoStringsCompositionSuffix = [
   'l',
   't',
   'a',
+  'x',
+  'y',
 ]
 
 const twoStringsComposition = [
