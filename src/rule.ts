@@ -138,6 +138,7 @@ const separateEnabled = [
 const stringNumberAttributes = `(${[
   'op',
   'opacity',
+  'gap',
   'fw',
   'p',
   'm',

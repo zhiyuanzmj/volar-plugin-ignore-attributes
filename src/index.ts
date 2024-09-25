@@ -1,6 +1,7 @@
 import type {
   VueLanguagePlugin,
 } from '@vue/language-core'
+import { getStart, getText } from '@vue-macros/volar/common'
 import { replaceSourceRange } from 'muggle-string'
 import { getRules } from './rule'
 
@@ -55,9 +56,9 @@ const plugin: VueLanguagePlugin = ({ modules: { typescript: ts }, vueCompilerOpt
             if (
               ts.isJsxAttribute(attribute)
               && (!attribute.initializer
-              || ts.isStringLiteral(attribute.initializer))
+                || ts.isStringLiteral(attribute.initializer))
             ) {
-              const attributeName = getText(attribute.name, sfc[source]!.ast, ts)
+              const attributeName = getText(attribute.name, { sfc, source, ts })
               if (exclude.some(rule => isMatched(rule, attributeName)))
                 continue
 
@@ -75,7 +76,7 @@ const plugin: VueLanguagePlugin = ({ modules: { typescript: ts }, vueCompilerOpt
                 replaceSourceRange(
                   embeddedFile.content,
                   source,
-                  getStart(attribute, sfc[source]!.ast, ts),
+                  getStart(attribute, { sfc, source, ts }),
                   attribute.end,
                 )
               }
@@ -91,19 +92,3 @@ const plugin: VueLanguagePlugin = ({ modules: { typescript: ts }, vueCompilerOpt
 }
 
 export default plugin
-
-function getStart(
-  node: import('typescript').Node,
-  ast: import('typescript').SourceFile,
-  ts: typeof import('typescript'),
-): number {
-  return (ts as any).getTokenPosOfNode(node, ast)
-}
-
-function getText(
-  node: import('typescript').Node,
-  ast: import('typescript').SourceFile,
-  ts: typeof import('typescript'),
-): string {
-  return ast.text.slice(getStart(node, ast, ts), node.end)
-}
