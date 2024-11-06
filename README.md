@@ -31,7 +31,7 @@ export default {
 }
 ```
 
-## Vue Config
+## Volar Config
 
 ```jsonc {5}
 // tsconfig.json
