@@ -94,7 +94,7 @@ function getStart(
   return (ts as any).getTokenPosOfNode(node, ast)
 }
 
-export function getText(
+function getText(
   node: import('typescript').Node,
   ast: import('typescript').SourceFile,
   ts: typeof import('typescript'),
