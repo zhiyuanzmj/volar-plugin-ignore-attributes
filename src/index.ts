@@ -1,8 +1,5 @@
-import type {
-  VueLanguagePlugin,
-} from '@vue/language-core'
-import { getStart, getText } from '@vue-macros/volar/common'
 import { replaceSourceRange } from 'muggle-string'
+import { createPlugin } from 'ts-macro'
 import { getRules } from './rule'
 
 interface Options {
@@ -25,7 +22,7 @@ function toRegex(rule: string | RegExp) {
   return _rule
 }
 
-const plugin: VueLanguagePlugin = ({ modules: { typescript: ts }, vueCompilerOptions }) => {
+const plugin = createPlugin(({ ts, vueCompilerOptions }) => {
   const cache = new Map<string, boolean>()
   const options = (vueCompilerOptions as any).ignoreAttributes ?? {} as Options
   const rules = getRules(options.prefix)
@@ -35,60 +32,72 @@ const plugin: VueLanguagePlugin = ({ modules: { typescript: ts }, vueCompilerOpt
 
   return {
     name: 'ignore-attributes',
-    version: 2.1,
-    resolveEmbeddedCode(_, sfc, embeddedFile) {
-      if (!['jsx', 'tsx'].includes(embeddedFile.lang))
+    resolveVirtualCode({ ast, codes, source, languageId }) {
+      if (!['jsx', 'tsx'].includes(languageId))
         return
 
-      for (const source of ['script', 'scriptSetup'] as const) {
-        if (!sfc[source]?.ast)
-          continue
+      function walk(
+        node: import('typescript').Node,
+      ) {
+        const properties = ts.isJsxElement(node)
+          ? node.openingElement.attributes.properties
+          : ts.isJsxSelfClosingElement(node)
+            ? node.attributes.properties
+            : []
+        for (const attribute of properties) {
+          if (
+            ts.isJsxAttribute(attribute)
+            && (!attribute.initializer
+              || ts.isStringLiteral(attribute.initializer))
+          ) {
+            const attributeName = getText(attribute.name, ast, ts)
+            if (exclude.some(rule => isMatched(rule, attributeName)))
+              continue
 
-        function walk(
-          node: import('typescript').Node,
-        ) {
-          const properties = ts.isJsxElement(node)
-            ? node.openingElement.attributes.properties
-            : ts.isJsxSelfClosingElement(node)
-              ? node.attributes.properties
-              : []
-          for (const attribute of properties) {
-            if (
-              ts.isJsxAttribute(attribute)
-              && (!attribute.initializer
-                || ts.isStringLiteral(attribute.initializer))
-            ) {
-              const attributeName = getText(attribute.name, { sfc, source, ts })
-              if (exclude.some(rule => isMatched(rule, attributeName)))
-                continue
+            const hasCached = cache.has(attributeName)
+            const result = hasCached
+              ? cache.get(attributeName)!
+              : rules.some((rule) => {
+                const result = isMatched(rule, attributeName)
+                return result
+              })
+            if (!hasCached)
+              cache.set(attributeName, result)
 
-              const hasCached = cache.has(attributeName)
-              const result = hasCached
-                ? cache.get(attributeName)!
-                : rules.some((rule) => {
-                  const result = isMatched(rule, attributeName)
-                  return result
-                })
-              if (!hasCached)
-                cache.set(attributeName, result)
-
-              if (result) {
-                replaceSourceRange(
-                  embeddedFile.content,
-                  source,
-                  getStart(attribute, { sfc, source, ts }),
-                  attribute.end,
-                )
-              }
+            if (result) {
+              replaceSourceRange(
+                codes,
+                source,
+                getStart(attribute, ast, ts),
+                attribute.end,
+              )
             }
           }
-
-          ts.forEachChild(node, walk)
         }
-        ts.forEachChild(sfc[source]?.ast, walk)
+
+        ts.forEachChild(node, walk)
       }
+      ts.forEachChild(ast, walk)
     },
   }
-}
+})
 
 export default plugin
+
+function getStart(
+  node:
+    | import('typescript').Node
+    | import('typescript').NodeArray<import('typescript').Node>,
+  ast: import('typescript').SourceFile,
+  ts: typeof import('typescript'),
+): number {
+  return (ts as any).getTokenPosOfNode(node, ast)
+}
+
+export function getText(
+  node: import('typescript').Node,
+  ast: import('typescript').SourceFile,
+  ts: typeof import('typescript'),
+): string {
+  return ast!.text.slice(getStart(node, ast, ts), node.end)
+}
