@@ -6,12 +6,29 @@
 [![JSDocs][jsdocs-src]][jsdocs-href]
 [![License][license-src]][license-href]
 
-A volar plugin to ignore unocss [attributes](https://github.com/zhiyuanzmj/volar-plugin-ignore-attributes/blob/master/src/rule.ts) for jsx.
+A Volar plugin to ignore unocss [attributes](https://github.com/zhiyuanzmj/volar-plugin-ignore-attributes/blob/master/src/rule.ts) for jsx.
 
 ## Installation
 
 ```sh
 pnpm add -D volar-plugin-ignore-attributes
+```
+
+## [TS Macro](https://github.com/ts-macro/ts-macro) Config
+
+```ts [tsm.config.json]
+import ignoreAttributes from 'volar-plugin-ignore-attributes'
+
+export default {
+  plugins: [
+    ignoreAttributes({
+      // Optional
+      include: ['icon'],
+      exclude: ['visible'],
+      prefix: 'uno:'
+    })
+  ]
+}
 ```
 
 ## Vue Config
@@ -31,23 +48,6 @@ pnpm add -D volar-plugin-ignore-attributes
     //   "prefix": "uno:"
     // }
   }
-}
-```
-
-## [ts-macro](https://github.com/ts-macro/ts-macro) Config
-
-```ts [tsm.config.json]
-import ignoreAttributes from 'volar-plugin-ignore-attributes'
-
-export default {
-  plugins: [
-    ignoreAttributes({
-      // Optional
-      include: ['icon'],
-      exclude: ['visible'],
-      prefix: 'uno:'
-    })
-  ]
 }
 ```
 

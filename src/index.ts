@@ -5,7 +5,7 @@ import { getRules } from './rule'
 interface Options {
   include?: string[]
   exclude?: string[]
-  flex?: string
+  prefix?: string
 }
 
 function isMatched(rule: string | RegExp, name: string) {
@@ -22,12 +22,13 @@ function toRegex(rule: string | RegExp) {
   return _rule
 }
 
-const plugin = createPlugin(({ ts, vueCompilerOptions }) => {
+const plugin = createPlugin<Options | undefined>((
+  { ts, vueCompilerOptions },
+  options = vueCompilerOptions?.ignoreAttributes ?? {},
+) => {
   const cache = new Map<string, boolean>()
-  const options = (vueCompilerOptions as any).ignoreAttributes ?? {} as Options
   const rules = getRules(options.prefix)
   rules.push(...options.include?.map(toRegex) || [])
-
   const exclude = [/^v-.*/, ...options.exclude?.map(toRegex) || []]
 
   return {
